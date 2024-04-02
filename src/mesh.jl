@@ -28,7 +28,7 @@ Base.ndims(::CartesianGrid{N}) where {N} = N
 Base.size(grid::CartesianGrid) = grid.n
 spacing(grid::CartesianGrid) = grid.spacing
 calculate_volume(grid::CartesianGrid) = prod(size(grid)) * prod(spacing(grid))
-
+calculate_surface(grid::CartesianGrid) = 2 * sum(spacing(grid)) * prod(size(grid) .- 1)
 
 """
     generate_mesh(grid::CartesianGrid{N,I}, staggered::Bool=false) where {N,I}
