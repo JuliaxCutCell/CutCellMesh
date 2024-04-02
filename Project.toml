@@ -1,0 +1,4 @@
+name = "CutCellMesh"
+uuid = "24df4ea3-ebf2-4a26-8fd2-c05fb361f768"
+authors = ["Fastaxx <Fastaxx@github.com>"]
+version = "0.1.0"
