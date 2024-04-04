@@ -7,6 +7,7 @@ Plots.default(show = true)
 # Include files
 include("mesh.jl")
 include("plot.jl")
+include("utils.jl")
 
 # Export functions
 export CartesianGrid, generate_mesh
