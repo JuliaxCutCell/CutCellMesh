@@ -28,7 +28,8 @@ println("Maillage généré :", mesh)
 ```
 
 
-## To do
-- Data Structure
+## ToDo
+- TensorMesh (classique) : Padding element, Area Plot (log) 
+- Data Structure : TreeMesh
 - Space Filling Curve for MPI
 - AMR (Quadtree/Octree)

@@ -29,6 +29,7 @@ Base.size(grid::CartesianGrid) = grid.n
 spacing(grid::CartesianGrid) = grid.spacing
 calculate_volume(grid::CartesianGrid) = prod(size(grid)) * prod(spacing(grid))
 calculate_surface(grid::CartesianGrid) = 2 * sum(spacing(grid)) * prod(size(grid) .- 1)
+total_cells(grid::CartesianGrid) = prod(size(grid))
 
 """
     generate_mesh(grid::CartesianGrid{N,I}, staggered::Bool=false) where {N,I}
@@ -55,3 +56,60 @@ function generate_mesh(grid::CartesianGrid{N,I}, staggered::Bool=false) where {N
         end
     end
 end
+
+"""
+    cell_centers(grid::CartesianGrid)
+
+Compute the cell centers of a Cartesian grid.
+
+# Arguments
+- `grid::CartesianGrid`: The Cartesian grid.
+
+# Returns
+An array of cell centers.
+
+"""
+function cell_centers(grid::CartesianGrid)
+    half_spacing = map(x -> x / 2, spacing(grid))
+    map(size(grid), half_spacing) do n, h
+        [h + i*h*2 for i in 0:n-1]
+    end
+end
+
+"""
+    cell_boundary_indices(grid::CartesianGrid)
+
+Compute the indices of the boundary cells in a Cartesian grid.
+
+# Arguments
+- `grid::CartesianGrid`: The Cartesian grid.
+
+# Returns
+An array of boolean values indicating whether each cell is on the boundary or not.
+
+"""
+function cell_boundary_indices(grid::CartesianGrid)
+    map(size(grid)) do n
+        [i == 1 || i == n for i in 1:n]
+    end
+end
+
+"""
+    cell_volumes(grid::CartesianGrid)
+
+Compute the volumes of the cells in a Cartesian grid.
+
+# Arguments
+- `grid::CartesianGrid`: The Cartesian grid.
+
+# Returns
+- An array of cell volumes.
+
+"""
+function cell_volumes(grid::CartesianGrid)
+    map(size(grid), spacing(grid)) do n, h
+        [h^2 for i in 1:n]
+    end
+end
+
+

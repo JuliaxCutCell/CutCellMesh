@@ -10,7 +10,7 @@ include("plot.jl")
 include("utils.jl")
 
 # Export functions
-export CartesianGrid, generate_mesh
+export CartesianGrid, generate_mesh, cell_centers, cell_boundary_indices, cell_volumes
 export plot_mesh
 export interpolate_values
 
