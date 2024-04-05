@@ -58,25 +58,6 @@ function generate_mesh(grid::CartesianGrid{N,I}, staggered::Bool=false) where {N
 end
 
 """
-    cell_centers(grid::CartesianGrid)
-
-Compute the cell centers of a Cartesian grid.
-
-# Arguments
-- `grid::CartesianGrid`: The Cartesian grid.
-
-# Returns
-An array of cell centers.
-
-"""
-function cell_centers(grid::CartesianGrid)
-    half_spacing = map(x -> x / 2, spacing(grid))
-    map(size(grid), half_spacing) do n, h
-        [h + i*h*2 for i in 0:n-1]
-    end
-end
-
-"""
     cell_boundary_indices(grid::CartesianGrid)
 
 Compute the indices of the boundary cells in a Cartesian grid.
@@ -112,4 +93,49 @@ function cell_volumes(grid::CartesianGrid)
     end
 end
 
+"""
+    get_edges(maillage)
 
+Given a mesh `mesh``, this function returns a list of edges representing the boundary of the mesh.
+
+# Arguments
+- `mesh`: A tuple or array of arrays representing the coordinates of the mesh points.
+
+# Returns
+- `edges`: A list of edges, where each edge is represented as a pair of points.
+
+"""
+function get_edges(mesh)
+    dim = length(mesh)
+
+    edges = []
+    if dim == 1
+        x = mesh[1]
+        for i in 1:length(x)-1
+            push!(edges, [x[i]])
+        end
+    elseif dim == 2
+        x, y = mesh
+        for i in 1:length(x)-1
+            for j in 1:length(y)-1
+                push!(edges, [[x[i], y[j]], [x[i+1], y[j]]])
+                push!(edges, [[x[i], y[j]], [x[i], y[j+1]]])
+            end
+        end
+    elseif dim == 3
+        x, y, z = mesh
+        for i in 1:length(x)-1
+            for j in 1:length(y)-1
+                for k in 1:length(z)-1
+                    push!(edges, [[x[i], y[j], z[k]], [x[i+1], y[j], z[k]]])
+                    push!(edges, [[x[i], y[j], z[k]], [x[i], y[j+1], z[k]]])
+                    push!(edges, [[x[i], y[j], z[k]], [x[i], y[j], z[k+1]]])
+                end
+            end
+        end
+    else
+        error("Unsupported mesh dimension: $dim")
+    end
+
+    return edges
+end

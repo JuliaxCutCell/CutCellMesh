@@ -12,7 +12,7 @@ Plot a 1D mesh.
 """
 function plot_mesh(mesh::Tuple{Vector{T}}) where T <: Number
     x = mesh[1]
-    p = plot(x, zeros(length(x)), seriestype=:scatter, legend=false, title="1D Mesh")
+    p = plot(x, zeros(length(x)), seriestype=:scatter, legend=false, title="1D Mesh", color=:blue)
     return p
 end
 
@@ -30,13 +30,12 @@ Plot a 2D mesh given by the `mesh` tuple.
 """
 function plot_mesh(mesh::Tuple{Vector{T}, Vector{T}}) where T <: Number
     x, y = mesh
-    p = plot(legend=false, title="2D Mesh")
-    for i in x
-        plot!([i, i], [minimum(y), maximum(y)], color=:black)
+    p = scatter(legend=false, title="2D Mesh Centers")
+
+    for (i, j) in Base.Iterators.product(x, y)
+        scatter!(p, [i], [j], color=:blue)
     end
-    for j in y
-        plot!([minimum(x), maximum(x)], [j, j], color=:black)
-    end
+
     return p
 end
 
@@ -54,21 +53,11 @@ Plot a 3D mesh given by `mesh`, which is a tuple of three vectors representing t
 """
 function plot_mesh(mesh::Tuple{Vector{T}, Vector{T}, Vector{T}}) where T <: Number
     x, y, z = mesh
-    p = plot(legend=false, title="3D Mesh")
-    for i in x
-        for j in y
-            plot!([i, i], [j, j], [minimum(z), maximum(z)], color=:black)
-        end
+    p = scatter(legend=false, title="3D Mesh Centers")
+
+    for (i, j, k) in Base.Iterators.product(x, y, z)
+        scatter!(p, [i], [j], [k], color=:blue)
     end
-    for i in x
-        for k in z
-            plot!([i, i], [minimum(y), maximum(y)], [k, k], color=:black)
-        end
-    end
-    for j in y
-        for k in z
-            plot!([minimum(x), maximum(x)], [j, j], [k, k], color=:black)
-        end
-    end
+
     return p
 end
