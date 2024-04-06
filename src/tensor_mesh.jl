@@ -2,32 +2,20 @@ using Plots
 Plots.default(show = true)
 abstract type AbstractMesh{N, T} end
 
-# Define constants for variable locations
-const NODES = 1
-const CELL_FACES = 2
-const CELL_EDGES = 3
+struct InvalidDimensionException{N} <: Exception end
 
-struct CartesianMesh{N, T, L} <: AbstractMesh{N, T}
+Base.showerror(io::IO, ::InvalidDimensionException{N}) where {N} = print(io, "Dimension is not valid: $(N).")
+
+struct CartesianMesh{N, T} <: AbstractMesh{N, T}
     # The mesh is defined by the spacing in each dimension
     spacing::NTuple{N, Vector{T}}
     # The position of the bottom-left corner of the mesh
     origin::NTuple{N, T}
-    # The location of the variables
-    location::L
-end
 
-function generate_mesh(mesh::CartesianMesh)
-    if mesh.location == NODES
-        # Generate the mesh for variables located at the nodes
-        mesh_points = [[o + sum(s[1:i]) for i in 0:length(s)] for (s, o) in zip(mesh.spacing, mesh.origin)]
-    elseif mesh.location == CELL_FACES
-        # Generate the mesh for variables located at the cell faces
-        mesh_points = [[o + sum(s[1:i]) - s[i]/2 for i in 1:length(s)] for (s, o) in zip(mesh.spacing, mesh.origin)]
-    elseif mesh.location == CELL_EDGES
-        # Generate the mesh for variables located at the cell edges
-        mesh_points = [[o + sum(s[1:i]) - s[i]/2 for i in 1:length(s)] for (s, o) in zip(mesh.spacing, mesh.origin)]
+    function CartesianMesh(spacing::NTuple{N, Vector{T}}, origin::NTuple{N, T}) where {N, T}
+        0 < N < 4 || throw(InvalidDimensionException{N}())
+        new{N, T}(spacing, origin)
     end
-    return tuple(mesh_points...)
 end
 
 function generate_mesh(mesh::CartesianMesh, staggered::Bool=false)
@@ -65,8 +53,52 @@ function plot_mesh(mesh::Tuple{Vector{T}, Vector{T}, Vector{T}}) where T <: Numb
 
     return p
 end
+function volume_cell(mesh::CartesianMesh)
+    # Determine the dimension of the mesh
+    dim = length(mesh.spacing)
 
-"""
+    # Calculate the volume (3D), area (2D), or length (1D) of each cell individually
+    if dim == 1
+        volume_array = mesh.spacing[1]
+    elseif dim == 2
+        volume_array = zeros(length(mesh.spacing[1]), length(mesh.spacing[2]))
+        for i in 1:length(mesh.spacing[1])
+            for j in 1:length(mesh.spacing[2])
+                volume_array[i, j] = mesh.spacing[1][i] * mesh.spacing[2][j]
+            end
+        end
+    elseif dim == 3
+        volume_array = zeros(length(mesh.spacing[1]), length(mesh.spacing[2]), length(mesh.spacing[3]))
+        for i in 1:length(mesh.spacing[1])
+            for j in 1:length(mesh.spacing[2])
+                for k in 1:length(mesh.spacing[3])
+                    volume_array[i, j, k] = mesh.spacing[1][i] * mesh.spacing[2][j] * mesh.spacing[3][k]
+                end
+            end
+        end
+    else
+        error("Unsupported mesh dimension: $dim")
+    end
+    
+    return volume_array
+end
+
+function plot_cell_volumes(sf::Array)
+    dim = length(size(sf))
+
+    if dim == 1
+        plot(sf, title="Volume des cellules 1D", label="Volume")
+    elseif dim == 2
+        heatmap(sf, aspect_ratio=1, color=:viridis, title="Volume des cellules 2D")
+    elseif dim == 3
+        for i in 1:size(sf, 3)
+            heatmap(sf[:, :, i], aspect_ratio=1, color=:viridis, title="Volume des cellules 3D - Couche $i")
+        end
+    else
+        error("Unsupported array dimension: $dim")
+    end
+end
+
 # Exemple d'utilisation
 # Cas 1D
 nx = 10
@@ -79,6 +111,10 @@ mesh = generate_mesh(grid)
 nc = total_cells(grid)
 plot_mesh(mesh)
 readline()
+sf = volume_cell(grid)
+@show sf
+plot_cell_volumes(sf)
+readline()
 
 # Cas 2D
 nx, ny  = 10, 10
@@ -89,6 +125,10 @@ grid = CartesianMesh((hx, hy), origin)
 mesh = generate_mesh(grid, true)
 nc = total_cells(grid)
 plot_mesh(mesh)
+readline()
+sf = volume_cell(grid)
+@show sf
+plot_cell_volumes(sf)
 readline()
 
 # Cas 3D
@@ -101,23 +141,22 @@ mesh = generate_mesh(grid)
 nc = total_cells(grid)
 #plot_mesh(mesh)
 #readline()
-
+sf = volume_cell(grid)
+@show sf
+plot_cell_volumes(sf)
+readline()
 
 # Cas test non Uniforme
-nx = 10
-hx = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-origin = (0.0,)
-grid = CartesianMesh((hx,), origin)
+nx, ny, nz = 10, 10, 10
+dx, dy, dz = 1.0, 1.0, 1.0
+hx = [1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5]
+hy = [1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5]
+hz = [1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5]
+origin = (0.0, 0.0, 0.0)
+grid = CartesianMesh((hx, hy, hz), origin)
 mesh = generate_mesh(grid)
-@show mesh
-plot_mesh(mesh)
-readline()
-"""
+sf = volume_cell(grid)
+@show sf
 
-nx, ny  = 10, 10
-dx, dy = 1.0, 1.0
-hx, hy = dx * ones(nx), dy * ones(ny)
-origin = (0.0, 0.0)
-grid = CartesianMesh((hx, hy), origin, CELL_EDGES)
-mesh = generate_mesh(grid)
-@show mesh
+
+
