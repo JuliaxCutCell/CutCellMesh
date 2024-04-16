@@ -27,8 +27,4 @@ mesh = generate_mesh(grid)
 println("Maillage généré :", mesh)
 ```
 
-
 ## ToDo
-- Data Structure : TreeMesh
-- Space Filling Curve for MPI
-- AMR (Quadtree/Octree)

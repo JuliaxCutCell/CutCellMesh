@@ -85,11 +85,24 @@ function refine_tree!(tree::QuadTree, φ, L, max_splits, max_level)
     tree.cells = new_cells  # replace the old cells with the new ones
 end
 
+function search(tree::QuadTree, x, y)
+    for cell in tree.cells
+        v = cell.vertices
+        if x >= v[1].x && x <= v[2].x && y >= v[1].y && y <= v[3].y
+            return cell
+        end
+    end
+    return nothing
+end
+
 function plot_tree(tree::QuadTree, φ)
     plot() # create a new plot
 
-    # Plot each cell as a separate series
-    map(tree.cells) do cell
+    # Create an array for all x and y coordinates
+    x_all = []
+    y_all = []
+
+    for cell in tree.cells
         # Get the vertices of the cell
         v = cell.vertices
         # Create an array of x and y coordinates
@@ -98,9 +111,13 @@ function plot_tree(tree::QuadTree, φ)
         # Add the first vertex to the end to close the rectangle
         push!(x, v[1].x)
         push!(y, v[1].y)
-        # Plot the rectangle
-        plot!(x, y, seriestype=:shape, line=1, fill=false)
+        # Add the coordinates to the all coordinates array
+        append!(x_all, x)
+        append!(y_all, y)
     end
+
+    # Plot all the rectangles in one go
+    plot!(x_all, y_all, seriestype=:shape, line=1, fill=false)
 
     # Create a grid of points
     x = range(-1, stop=1, length=100)
@@ -115,8 +132,8 @@ end
 
 # Define your computational domain D and level set function φ here
 D = [-1, 1, -1, 1]
-φ = (x, y) -> sqrt(x^2 + y^2) - 0.5
-L = 1.2
+φ = (x, y) -> x^3 - y^2
+L = 2.0
 
 # Define the vertices of the root cell
 vertice = [Vertex(-1.0, -1.0), Vertex(1.0, -1.0), Vertex(1.0, 1.0), Vertex(-1.0, 1.0)]
@@ -131,9 +148,46 @@ root_cell = Cell(vertice, center, 0)
 tree = QuadTree([root_cell], Vertex[], Edge[], Face[], [-1.0, 1.0, -1.0, 1.0])
 
 # Refine the QuadTree based on the level set function φ
-refine_tree!(tree, φ, L, 500, 5)  # limit to 1000 splits and maximum level 5
+refine_tree!(tree, φ, L, 1000, 6)  # limit to 1000 splits and maximum level 5
 
 @show tree.cells
 # Plot the QuadTree
 plot_tree(tree, φ)
 readline()
+
+function z_order_curve(tree::QuadTree)
+    # Sort the cells by their center coordinates using the Z-order curve
+    sorted_cells = sort(tree.cells, by = cell -> (cell.center.x, cell.center.y))
+    return sorted_cells
+end
+
+function hilbert_index(x, y, n)
+    x = floor(Int, x)
+    y = floor(Int, y)
+    index = 0
+    s = n ÷ 2
+    while s > 0
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        index += s * s * ((3 * rx) ⊻ ry)
+        x, y = rot(s, x, y, rx, ry)
+        s = s ÷ 2
+    end
+    return index
+end
+
+function rot(n, x, y, rx, ry)
+    if ry == 0
+        if rx == 1
+            x = n - 1 - x
+            y = n - 1 - y
+        end
+        return y, x
+    end
+    return x, y
+end
+
+function hilbert_order_curve(tree::QuadTree, n)
+    sorted_cells = sort(tree.cells, by = cell -> hilbert_index(cell.center.x, cell.center.y, n))
+    return sorted_cells
+end
