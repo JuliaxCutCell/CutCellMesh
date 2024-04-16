@@ -1,5 +1,6 @@
 using CutCellMesh
-
+using Plots
+Plots.default(show = true)
 # Cas 1D
 grid = CartesianGrid((10,), (0.1,))
 mesh = generate_mesh(grid)

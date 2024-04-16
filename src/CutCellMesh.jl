@@ -8,6 +8,7 @@ Plots.default(show = true)
 include("mesh.jl")
 include("plot.jl")
 include("utils.jl")
+include("tree.jl")
 
 # Export functions
 export CartesianGrid, generate_mesh, cell_boundary_indices, cell_volumes, get_edges
