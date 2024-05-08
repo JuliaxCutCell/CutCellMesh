@@ -132,8 +132,8 @@ end
 
 # Define your computational domain D and level set function φ here
 D = [-1, 1, -1, 1]
-φ = (x, y) -> x^3 - y^2
-L = 2.0
+φ = (x, y) -> sqrt(x^2+y^2)-0.25 #x^3 - y^2
+L = 1.0
 
 # Define the vertices of the root cell
 vertice = [Vertex(-1.0, -1.0), Vertex(1.0, -1.0), Vertex(1.0, 1.0), Vertex(-1.0, 1.0)]
