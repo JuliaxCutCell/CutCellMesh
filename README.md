@@ -3,6 +3,8 @@
 ## Overview
 This repository contains tools for the generation of 1D, 2D and 3D structured meshes
 
+![Cartesian Mesh](img/cartesianmesh.png)
+
 ## Usage
 ```
 # Test 1D
