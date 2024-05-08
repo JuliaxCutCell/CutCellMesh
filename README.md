@@ -5,26 +5,23 @@ This repository contains tools for the generation of 1D, 2D and 3D structured me
 
 ## Usage
 ```
-# Creation of a 2D Cartesian grid with 10 points in x and 20 points in y
-grid = CartesianGrid((10, 20), (0.1, 0.05))
+# Test 1D
+nx = 10
+hx = ones(nx)
+x0 = 0.0
+mesh = CartesianMesh((hx,), (x0,))
+p = plot_grid(mesh, act_nodes=true, act_centers=true, act_edges=true, act_faces=true)
+display(p)
 
-# Display grid dimensions
-println("Dimensions de la grille :", ndims(grid))
-
-# Display grid size
-println("Taille de la grille :", size(grid))
-
-# Display spacing between grid points
-println("Espacement entre les points de la grille :", spacing(grid))
-
-# Grid volume calculation
-println("Volume de la grille :", calculate_volume(grid))
-
-# Generating a mesh from the grid
-mesh = generate_mesh(grid)
-
-# Mesh display
-println("Maillage généré :", mesh)
+# Test 2D
+nx, ny = 10, 10
+hx, hy = [1.0*rand() for i in 1:nx], [1.0*rand() for j in 1:ny]
+x0, y0 = 0.0, 0.0
+mesh = CartesianMesh((hx, hy), (x0, y0))
+center = centers(mesh)
+p = plot_grid(mesh, act_nodes=true, act_centers=true, act_edges=true, act_faces=true)
+display(p)
 ```
 
 ## ToDo
+- AMR : Block-Structured, Point-wise (Quadtree)

@@ -1,29 +1,20 @@
 using CutCellMesh
 using Plots
 Plots.default(show = true)
-# Cas 1D
-grid = CartesianGrid((10,), (0.1,))
-mesh = generate_mesh(grid)
-@show mesh
-plot_mesh(mesh)
-values = [sin(x) for x in mesh[1]]
-edge = get_edges(mesh)
-@show edge
-@show interpolate_values(mesh, values, (0.5,))
 
-# Cas 2D
-grid = CartesianGrid((10, 10), (0.1, 0.1))
-mesh = generate_mesh(grid)
-@show mesh
-plot_mesh(mesh)
-values = [sin(x) + cos(y) for x in mesh[1], y in mesh[2]]
-edge = get_edges(mesh)
-@show edge
-@show interpolate_values(mesh, values, (0.5, 0.5))
+# Test 1D
+nx = 10
+hx = ones(nx)
+x0 = 0.0
+mesh = CartesianMesh((hx,), (x0,))
+p = plot_grid(mesh, act_nodes=true, act_centers=true, act_edges=true, act_faces=true)
+display(p)
 
-# Cas 3D
-grid = CartesianGrid((10, 10, 10), (0.1, 0.1, 0.1))
-mesh = generate_mesh(grid)
-#plot_mesh(mesh)
-values = [sin(x) + cos(y) + tan(z) for x in mesh[1], y in mesh[2], z in mesh[3]]
-@show interpolate_values(mesh, values, (0.5, 0.5, 0.5))
+# Test 2D
+nx, ny = 10, 10
+hx, hy = [1.0*rand() for i in 1:nx], [1.0*rand() for j in 1:ny]
+x0, y0 = 0.0, 0.0
+mesh = CartesianMesh((hx, hy), (x0, y0))
+center = centers(mesh)
+p = plot_grid(mesh, act_nodes=true, act_centers=true, act_edges=true, act_faces=true)
+display(p)
