@@ -5,6 +5,9 @@ This repository contains tools for the generation of 1D, 2D and 3D structured me
 
 ![Cartesian Mesh](img/cartesianmesh.png)
 
+Currently, CutCellMesh handles : 
+- Cartesian Meshes (1D, 2D, 3D)
+
 ## Usage
 ```
 # Test 1D
@@ -23,6 +26,12 @@ mesh = CartesianMesh((hx, hy), (x0, y0))
 center = centers(mesh)
 p = plot_grid(mesh, act_nodes=true, act_centers=true, act_edges=true, act_faces=true)
 display(p)
+```
+
+## Install
+```
+julia
+] add https://github.com/JuliaxCutCell/CutCellMesh.jl
 ```
 
 ## ToDo
