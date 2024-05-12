@@ -4,9 +4,11 @@
 This repository contains tools for the generation of 1D, 2D and 3D structured meshes
 
 ![Cartesian Mesh](img/cartesianmesh.png)
+![Cartesian Mesh](img/treemesh.png)
 
 Currently, CutCellMesh handles : 
 - Cartesian Meshes (1D, 2D, 3D)
+- Quadtree
 
 ## Usage
 ```
@@ -36,3 +38,4 @@ julia
 
 ## ToDo
 - AMR : Block-Structured, Point-wise (Quadtree)
+- AMR : Dealing Hanging Nodes
